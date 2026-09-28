@@ -1,0 +1,176 @@
+/* Threestar Packaging — shared site styles (landing + products). */
+
+:root {
+  --ink: #050910;            /* page + scrim base; scrims use the same rgb */
+  --ink-2: #0b1320;
+  --line: rgba(244, 247, 251, 0.14);
+  --text: #f4f7fb;
+  --muted: rgba(244, 247, 251, 0.72);
+  --brand: #1268c3;          /* eyedropped from the building — confirm hex (spec §14) */
+  --brand-hi: #3b8fe6;
+  --paper: #f5f7fa;
+  --paper-ink: #0c1624;
+  --paper-muted: #4a5668;
+  --paper-line: #dde3eb;
+  --gutter: clamp(16px, 5vw, 96px);
+  --radius: 10px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img, video, canvas { display: block; max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3 { line-height: 1.08; letter-spacing: -0.02em; margin: 0; overflow-wrap: break-word; }
+p { margin: 0; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 var(--gutter); }
+
+:focus-visible { outline: 2px solid var(--brand-hi); outline-offset: 3px; }
+
+/* ── Placeholders (spec §14): visibly unfinished so nobody mistakes them for real.
+      scripts/check-launch.sh fails while any [data-placeholder] remains. ─────── */
+.tbc {
+  display: inline-block;
+  padding: 0 0.45em;
+  border: 1px dashed currentColor;
+  border-radius: 4px;
+  font-style: normal;
+  opacity: 0.75;
+}
+.draft-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.25em 0.7em;
+  border: 1px dashed rgba(255, 200, 80, 0.8);
+  color: #ffd27a;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* ── Nav: minimal, transparent, sits over the stage and scrolls away ─────────── */
+.site-nav {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: max(18px, env(safe-area-inset-top)) var(--gutter) 18px;
+  color: var(--text);
+}
+.site-nav__brand {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  font-size: 1.05rem;
+  white-space: nowrap;
+}
+.site-nav__brand span { font-weight: 400; opacity: 0.8; }
+.site-nav__links { margin-left: auto; display: flex; gap: clamp(14px, 2.5vw, 32px); }
+.site-nav__links a { text-decoration: none; font-size: 0.92rem; opacity: 0.85; }
+.site-nav__links a:hover { opacity: 1; }
+@media (max-width: 560px) {
+  .draft-pill { display: none; }
+  .site-nav__about { display: none; }
+}
+
+/* ── Shared section type ────────────────────────────────────────────────────── */
+.eyebrow, .ft-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-hi);
+}
+.section-title { font-size: clamp(1.9rem, 1.2rem + 3vw, 3.4rem); margin-top: 0.4em; }
+.lede { margin-top: 1rem; font-size: 1.1rem; color: var(--muted); max-width: 40rem; }
+.note { margin-top: 1rem; font-size: 0.85rem; }
+
+.button {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.85em 1.5em;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.button:hover { background: var(--brand-hi); }
+
+/* ── Stats band: 4 figures, bordered grid ───────────────────────────────────── */
+.stats { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--ink); }
+.stats__grid {
+  margin: 0 auto;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.stats__item {
+  padding: clamp(24px, 4vw, 48px) var(--gutter);
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.4rem;
+}
+.stats__item:first-child { border-left: 0; }
+.stats__item dt { color: var(--muted); font-size: 0.9rem; }
+.stats__item dd { margin: 0; font-size: clamp(1.6rem, 1rem + 2vw, 2.6rem); font-weight: 700; letter-spacing: -0.02em; align-self: flex-start; }
+@media (max-width: 760px) {
+  .stats__grid { grid-template-columns: 1fr 1fr; }
+  .stats__item:nth-child(3) { border-left: 0; }
+  .stats__item:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+
+/* ── Products hand-off ──────────────────────────────────────────────────────── */
+.handoff { padding: clamp(72px, 12vw, 160px) 0; background: linear-gradient(180deg, var(--ink), var(--ink-2)); }
+.chips { list-style: none; padding: 0; margin: 2rem 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.chips a {
+  display: inline-block;
+  padding: 0.5em 1em;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+.chips a:hover { border-color: var(--brand-hi); background: rgba(18, 104, 195, 0.18); }
+
+/* ── Full tour ──────────────────────────────────────────────────────────────── */
+.tour { padding: clamp(72px, 10vw, 140px) 0; background: var(--ink-2); }
+.tour__frame { margin-top: 2.5rem; border-radius: var(--radius); overflow: hidden; background: #000; aspect-ratio: 16 / 9; }
+.tour__video { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── Footer ─────────────────────────────────────────────────────────────────── */
+.site-footer { border-top: 1px solid var(--line); padding: 48px 0 max(48px, env(safe-area-inset-bottom)); color: var(--muted); font-size: 0.92rem; }
+.site-footer__inner { display: flex; flex-wrap: wrap; gap: 12px 32px; align-items: baseline; }
+.site-footer__brand { color: var(--text); font-weight: 700; }
+.site-footer__small { margin-left: auto; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "threestar-flythrough",
+  "private": true,
+  "description": "Threestar Packaging scroll-driven factory flythrough — static site + WordPress template",
+  "scripts": {
+    "serve": "node tests/serve.mjs",
+    "test": "node tests/flythrough.test.mjs",
+    "test-master": "scripts/make-test-master.sh build && ALLOW_LOW_BITRATE=1 scripts/encode-frames.sh --placeholder --landscape build/test-master-landscape.mp4 --portrait build/test-master-portrait.mp4 --out build/test-frames --posters build/test-frames",
+    "check-launch": "scripts/check-launch.sh"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}

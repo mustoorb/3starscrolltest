@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Threestar Packaging — Inside the factory</title>
+  <meta name="description" content="Fly through the Threestar Packaging factory, from the gate to the dispatch bay, then see what the machines make.">
+  <meta name="theme-color" content="#050910">
+  <script>
+    /* Before first paint: mark JS, and opt into the pinned flythrough unless the
+       visitor prefers reduced motion. flythrough.js removes ft-on if it can't run. */
+    (function (d) {
+      var c = d.documentElement;
+      c.className = c.className.replace('no-js', 'js');
+      if (!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) c.className += ' ft-on';
+    })(document);
+  </script>
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="stylesheet" href="css/flythrough.css">
+</head>
+<body>
+
+<header class="site-nav">
+  <!-- Logo: SVG from the client pending (spec §14). Text wordmark until then. -->
+  <a class="site-nav__brand" href="./">Threestar <span>Packaging</span></a>
+  <span class="draft-pill" data-placeholder>Draft · figures TBC</span>
+  <nav class="site-nav__links" aria-label="Main">
+    <a class="site-nav__about" href="#stats">About</a>
+    <a href="products.html">Products</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<main>
+  <!-- ── Pinned scrub section (spec §12). data-frames-base may point at a CDN. ── -->
+  <section id="flythrough" class="ft" data-frames-base="assets/frames/" aria-label="Flythrough of the factory">
+    <div id="ft-stage" class="ft-stage">
+      <picture>
+        <source media="(max-aspect-ratio: 1/1)" type="image/avif" srcset="assets/poster-portrait.avif">
+        <source media="(max-aspect-ratio: 1/1)" srcset="assets/poster-portrait.jpg">
+        <source type="image/avif" srcset="assets/poster-landscape.avif">
+        <img class="ft-poster" src="assets/poster-landscape.jpg" alt="Aerial view of the Threestar Packaging factory" fetchpriority="high" decoding="async">
+      </picture>
+      <canvas id="ft-canvas" class="ft-canvas" aria-hidden="true"></canvas>
+
+      <div class="ft-layer">
+        <div class="ft-hero">
+          <p class="ft-eyebrow">Threestar Packaging</p>
+          <h1 class="ft-hero__title">Fly through the factory.</h1>
+          <p class="ft-hero__sub" data-draft>One continuous pass — from the gate, across the production floor, out through dispatch.</p>
+        </div>
+
+        <!-- Beats map to hold spans in document order (js/flythrough.js TIMELINE).
+             Machine names and every figure are pending from the client (spec §14). -->
+        <article class="ft-beat" id="beat-hall">
+          <p class="ft-eyebrow">01 · Main hall</p>
+          <h2 class="ft-beat__title">The production floor</h2>
+          <p class="ft-beat__body" data-draft>A red steel portal frame spans one open, sealed floor.</p>
+          <dl class="ft-specs">
+            <div><dt>Floor area</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+            <div><dt>Production halls</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+          </dl>
+        </article>
+
+        <article class="ft-beat" id="beat-bags">
+          <p class="ft-eyebrow">02 · Bag-making &amp; sealing</p>
+          <h2 class="ft-beat__title"><span class="tbc" data-placeholder>Machine name TBC</span></h2>
+          <p class="ft-beat__body" data-draft>Film is cut, sealed and formed into finished bags on the line.</p>
+          <dl class="ft-specs">
+            <div><dt>Lines</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+            <div><dt>Output</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+            <div><dt>Cut accuracy</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+          </dl>
+        </article>
+
+        <article class="ft-beat" id="beat-film">
+          <p class="ft-eyebrow">03 · Blown-film extrusion</p>
+          <h2 class="ft-beat__title"><span class="tbc" data-placeholder>Machine name TBC</span></h2>
+          <p class="ft-beat__body" data-draft>Film is blown and wound in-house, before it reaches any other line.</p>
+          <dl class="ft-specs">
+            <div><dt>Layers</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+            <div><dt>Output</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+            <div><dt>Gauge</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+          </dl>
+        </article>
+
+        <article class="ft-beat" id="beat-print">
+          <p class="ft-eyebrow">04 · Printing &amp; rewinding</p>
+          <h2 class="ft-beat__title"><span class="tbc" data-placeholder>Machine name TBC</span></h2>
+          <p class="ft-beat__body" data-draft>Printed on the gantry, then rewound onto finished rolls.</p>
+          <dl class="ft-specs">
+            <div><dt>Colours</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+            <div><dt>Web width</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+            <div><dt>Speed</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+          </dl>
+        </article>
+
+        <article class="ft-beat" id="beat-dispatch">
+          <p class="ft-eyebrow">05 · Dispatch</p>
+          <h2 class="ft-beat__title">Packed, stacked, shipped</h2>
+          <p class="ft-beat__body" data-draft>Finished cartons leave through the dispatch bay.</p>
+          <dl class="ft-specs">
+            <div><dt>Pallet positions</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+            <div><dt>Dispatch time</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+          </dl>
+        </article>
+      </div>
+
+      <p class="ft-cue" aria-hidden="true"><span>Scroll to fly through</span></p>
+      <div class="ft-loader" role="progressbar" aria-label="Loading flythrough"><div class="ft-loader__bar"></div></div>
+      <p class="ft-badge" aria-hidden="true">Test frames — not footage</p>
+    </div>
+  </section>
+
+  <!-- ── Stats band ── -->
+  <section id="stats" class="stats" aria-labelledby="stats-title">
+    <h2 id="stats-title" class="visually-hidden">Threestar Packaging in numbers</h2>
+    <dl class="stats__grid">
+      <div class="stats__item"><dt>Established</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+      <div class="stats__item"><dt>Floor area</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+      <div class="stats__item"><dt>Team</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+      <div class="stats__item"><dt>Export markets</dt><dd class="tbc" data-placeholder>TBC</dd></div>
+    </dl>
+  </section>
+
+  <!-- ── Products hand-off ── -->
+  <section class="handoff" aria-labelledby="handoff-title">
+    <div class="wrap">
+      <p class="eyebrow">Products</p>
+      <h2 id="handoff-title" class="section-title">You've seen the machines.<br>Here's what they make.</h2>
+      <p class="lede" data-draft>Packaging organised by the industry it serves — find your sector, then the format.</p>
+      <ul class="chips" data-draft>
+        <li><a href="products.html#food-beverage">Food &amp; Beverage</a></li>
+        <li><a href="products.html#personal-care">Personal Care</a></li>
+        <li><a href="products.html#home-care">Home Care</a></li>
+        <li><a href="products.html#pet-care">Pet Care</a></li>
+        <li><a href="products.html#garments">Garments</a></li>
+        <li><a href="products.html#industrial">Industrial</a></li>
+        <li><a href="products.html#disposables">Disposables</a></li>
+        <li><a href="products.html#retail">Retail</a></li>
+      </ul>
+      <a class="button" href="products.html">View all products</a>
+    </div>
+  </section>
+
+  <!-- ── Full tour: preload="none" so it costs nothing until played ── -->
+  <section class="tour" aria-labelledby="tour-title">
+    <div class="wrap">
+      <p class="eyebrow">Full walkthrough</p>
+      <h2 id="tour-title" class="section-title">The complete tour</h2>
+      <p class="lede">Every line, uncut — 2 min 23 s.</p>
+      <div class="tour__frame">
+        <video class="tour__video" controls preload="none" playsinline poster="assets/poster-landscape.jpg">
+          <source src="assets/video/full-tour.mp4" type="video/mp4">
+        </video>
+      </div>
+      <p class="note tbc" data-placeholder>Video file pending from the client (full 2:23 cut).</p>
+    </div>
+  </section>
+</main>
+
+<footer id="contact" class="site-footer">
+  <div class="wrap site-footer__inner">
+    <p class="site-footer__brand">Threestar Packaging</p>
+    <p class="tbc" data-placeholder>Address, phone and email TBC</p>
+    <p class="site-footer__small">© 2026 Threestar Packaging</p>
+  </div>
+</footer>
+
+<script src="js/flythrough.js" defer></script>
+</body>
+</html>

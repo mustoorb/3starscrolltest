@@ -1,0 +1,260 @@
+/*
+ * Flythrough stage.
+ *
+ * Two layouts:
+ *   default          static — poster + hero, beats as stacked sections. Used with no JS,
+ *                    prefers-reduced-motion, or when frames can't load.
+ *   html.ft-on       pinned — sticky 100svh stage, canvas, beats cross-fading over it.
+ *
+ * All darkening lives here, never in the grade (spec §10).
+ * Z-order: canvas 0 → side scrim 1 → vignette 2 → beats 3 → hero 4 → UI 5.
+ */
+
+.ft { position: relative; background: var(--ink); }
+
+.ft-stage { position: relative; }
+
+.ft-poster {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.ft-canvas { display: none; }
+
+/* Scrims — strength follows --ft-scrim, set by JS (1 while text is up, less in travel) */
+.ft-stage::before,
+.ft-stage::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100vh;
+  height: 100svh;
+  pointer-events: none;
+}
+.ft-stage::before {
+  z-index: 1;
+  opacity: var(--ft-scrim, 1);
+  background: linear-gradient(100deg,
+    rgba(5, 9, 16, 0.90) 0%,
+    rgba(5, 9, 16, 0.78) 22%,
+    rgba(5, 9, 16, 0.50) 42%,
+    rgba(5, 9, 16, 0.18) 60%,
+    rgba(5, 9, 16, 0) 74%);
+}
+.ft-stage::after {
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(5, 9, 16, 0.60) 0%, rgba(5, 9, 16, 0) 16%, rgba(5, 9, 16, 0) 80%, rgba(5, 9, 16, 0.55) 100%),
+    radial-gradient(ellipse 120% 100% at 50% 50%, rgba(5, 9, 16, 0) 55%, rgba(5, 9, 16, 0.45) 100%);
+}
+
+/* ── Text ─────────────────────────────────────────────────────────────────────── */
+.ft-layer { position: relative; z-index: 3; }
+
+.ft-hero,
+.ft-beat { max-width: 36rem; }
+
+.ft-hero {
+  z-index: 4;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 96px var(--gutter) 120px;
+}
+.ft-hero__title {
+  font-size: clamp(2.6rem, 1.4rem + 5.2vw, 5.6rem);
+  font-weight: 800;
+  margin-top: 0.3em;
+  text-shadow: 0 2px 24px rgba(5, 9, 16, 0.55);
+}
+.ft-hero__sub {
+  margin-top: 1.1rem;
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem);
+  color: var(--muted);
+  max-width: 30rem;
+  text-shadow: 0 1px 12px rgba(5, 9, 16, 0.7);
+}
+
+.ft-beat { padding: 72px var(--gutter); border-top: 1px solid var(--line); max-width: none; }
+.ft-beat > * { max-width: 34rem; }
+.ft-beat__title {
+  font-size: clamp(2rem, 1.2rem + 3.2vw, 3.6rem);
+  font-weight: 800;
+  margin-top: 0.35em;
+  text-shadow: 0 2px 24px rgba(5, 9, 16, 0.6);
+}
+.ft-beat__title .tbc { font-size: 0.6em; font-weight: 600; letter-spacing: -0.01em; }
+.ft-beat__body {
+  margin-top: 0.9rem;
+  font-size: clamp(1rem, 0.94rem + 0.3vw, 1.15rem);
+  color: var(--muted);
+  text-shadow: 0 1px 12px rgba(5, 9, 16, 0.8);
+}
+.ft-specs {
+  margin: 1.5rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+}
+.ft-specs > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  padding-left: 12px;
+  border-left: 2px solid var(--brand);
+}
+.ft-specs dt { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.02em; }
+.ft-specs dd { margin: 0; font-size: 1.35rem; font-weight: 700; align-self: flex-start; text-shadow: 0 1px 10px rgba(5, 9, 16, 0.7); }
+
+.ft-cue, .ft-loader, .ft-badge { display: none; }
+
+/* ═══ Pinned layout ════════════════════════════════════════════════════════════ */
+
+/* Height before JS measures: TIMELINE total (8810px) + stage. JS then sets it exactly. */
+.ft-on .ft { height: calc(8810px + 100vh); height: calc(8810px + 100svh); }
+
+.ft-on .ft-stage {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.ft-on .ft-canvas {
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+/* The poster is frame 0; it covers the gap until the canvas has drawn. */
+.ft-drawn .ft-poster { visibility: hidden; }
+
+/* Hero and beats share one grid cell so they cross-fade in place. */
+.ft-on .ft-layer {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: grid;
+  align-items: center;
+  padding: 96px var(--gutter);
+  pointer-events: none;
+}
+.ft-on .ft-hero,
+.ft-on .ft-beat {
+  grid-area: 1 / 1;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  max-width: 36rem;
+  will-change: opacity, transform;
+}
+.ft-on .ft-beat { opacity: 0; }
+.ft-on .ft-beat.is-active { pointer-events: auto; }
+
+/* Scroll cue */
+.ft-on .ft-cue {
+  display: block;
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.ft-on .ft-cue::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 36px;
+  margin: 12px auto 0;
+  background: linear-gradient(var(--text), transparent);
+  animation: ft-cue 1.8s ease-in-out infinite;
+  transform-origin: top;
+}
+@keyframes ft-cue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+/* Cue appears once frames are ready; JS then fades it as scrolling starts. */
+.ft-on:not(.ft-ready) .ft-cue { opacity: 0 !important; }
+
+/* Loader — until ~30 frames are ready */
+.ft-on .ft-loader {
+  display: block;
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: max(40px, env(safe-area-inset-bottom));
+  width: min(220px, 50vw);
+  height: 2px;
+  margin-left: max(-110px, -25vw);
+  background: rgba(244, 247, 251, 0.18);
+  overflow: hidden;
+  transition: opacity 0.5s;
+}
+.ft-loader__bar { height: 100%; background: var(--text); transform: scaleX(0); transform-origin: left; transition: transform 0.25s; }
+.ft-ready .ft-loader { opacity: 0; }
+
+/* Synthetic test frames: say so on screen */
+.ft-test-frames .ft-badge {
+  display: block;
+  position: absolute;
+  z-index: 5;
+  right: 16px;
+  bottom: 16px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffd27a;
+  border: 1px dashed currentColor;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* ?debug overlay */
+.ft-debug {
+  position: absolute;
+  z-index: 6;
+  top: 72px;
+  right: 16px;
+  margin: 0;
+  padding: 10px 12px;
+  font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #9fe3a8;
+  background: rgba(0, 0, 0, 0.72);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* ═══ Portrait: text at the bottom, so the side scrim becomes bottom-weighted ═══ */
+@media (max-aspect-ratio: 1/1) {
+  .ft-stage::before {
+    background: linear-gradient(0deg,
+      rgba(5, 9, 16, 0.94) 0%,
+      rgba(5, 9, 16, 0.82) 24%,
+      rgba(5, 9, 16, 0.45) 46%,
+      rgba(5, 9, 16, 0) 68%);
+  }
+  .ft-on .ft-layer {
+    align-items: end;
+    padding: 88px 16px calc(96px + env(safe-area-inset-bottom));
+  }
+  .ft-beat__title { font-size: clamp(1.8rem, 1.1rem + 4vw, 2.6rem); }
+  .ft-specs { gap: 10px 20px; margin-top: 1.1rem; }
+  .ft-specs dd { font-size: 1.15rem; }
+  .ft-on .ft-cue { bottom: max(20px, env(safe-area-inset-bottom)); }
+}

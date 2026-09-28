@@ -1,0 +1,7 @@
+build/
+qa/
+node_modules/
+test-results/
+._*
+.DS_Store
+*.log
