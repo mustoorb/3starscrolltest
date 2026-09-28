@@ -1,0 +1,31 @@
+# Netlify: import the repo; no settings to fill in — this file provides them.
+#
+# Until real frames are committed to assets/frames/, every deploy is a PREVIEW
+# with synthetic test frames generated during the build (~5–10 min, badged
+# "Test frames — not footage" on the page). See scripts/build-site.sh.
+
+[build]
+  command = "scripts/build-site.sh"
+  publish = "_site"
+
+[build.environment]
+  # package.json only carries test tooling; never fetch browsers on Netlify.
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
+
+# Frames may be fetched from another origin (e.g. this site as a CDN for WordPress).
+# The manifest fetch() needs CORS (spec §15).
+[[headers]]
+  for = "/assets/frames/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/*.avif"
+  [headers.values]
+    Content-Type = "image/avif"
+
+# /products → products.html
+[[redirects]]
+  from = "/products"
+  to = "/products.html"
+  status = 200
