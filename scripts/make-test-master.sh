@@ -18,8 +18,12 @@ set -euo pipefail
 out="${1:-build}"
 mkdir -p "$out"
 
+# drawtext needs a font file; build machines (e.g. Netlify) may lack fontconfig.
 font=$(fc-match -f '%{file}' 'DejaVu Sans:bold' 2>/dev/null || true)
-[ -n "$font" ] && fontopt="fontfile='$font':" || fontopt=""
+if [ -z "$font" ] || [ ! -f "$font" ]; then
+  font=$(find /usr/share/fonts /usr/local/share/fonts /System/Library/Fonts -type f \( -name '*.ttf' -o -name '*.ttc' \) 2>/dev/null | head -n1 || true)
+fi
+fontopt=""; [ -n "$font" ] && fontopt="fontfile='$font':"
 
 label() { # drawtext chain: frame number + segment/hold label
   local size="$1"
@@ -29,10 +33,13 @@ label() { # drawtext chain: frame number + segment/hold label
 }
 
 make() { # <size> <fontsize> <file>
+  local vf="null"
+  # Without a font file, frames go unlabelled rather than failing the build.
+  if [ -n "$font" ]; then vf="$(label "$2")"; else echo "(no font found: test frames will be unlabelled)"; fi
   ffmpeg -hide_banner -loglevel error -stats -y \
     -f lavfi -i "testsrc2=s=$1:r=30000/1001" -frames:v 779 \
-    -vf "$(label "$2")" \
-    -c:v libx264 -preset veryfast -crf 16 -pix_fmt yuv420p "$3"
+    -vf "$vf" \
+    -c:v libx264 -preset ultrafast -crf 16 -pix_fmt yuv420p "$3"
 }
 
 make 3840x2160 360 "$out/test-master-landscape.mp4"

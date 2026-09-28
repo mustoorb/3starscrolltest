@@ -570,6 +570,8 @@
       if (params.get('format') === 'webp' || params.get('format') === 'avif') fmt = params.get('format');
       if (!manifest.sets[name][fmt]) fmt = fmt === 'avif' ? 'webp' : 'avif';
       if (!manifest.sets[name][fmt]) throw new Error('no usable frame format');
+      // An AVIF-only build (e.g. the preview) on a browser without AVIF: go static.
+      if (fmt === 'avif' && !res[1] && !params.get('format')) throw new Error('no AVIF support and no WebP set');
 
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onResize, { passive: true });

@@ -1,0 +1,62 @@
+# GitHub Pages preview of main, using synthetic test frames until the real 4K
+# encode exists (spec §5). Settings → Pages → Source must be "GitHub Actions".
+#
+# The test frames are generated here and deployed, never committed. They take about
+# 5–10 minutes to encode and are cached until the encode scripts change.
+name: Pages preview
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore test frames
+        id: frames
+        uses: actions/cache@v4
+        with:
+          path: build/test-frames
+          key: test-frames-${{ hashFiles('scripts/make-test-master.sh', 'scripts/encode-frames.sh', 'scripts/verify-master.sh') }}
+
+      - name: Install ffmpeg
+        if: steps.frames.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ffmpeg fontconfig fonts-dejavu-core
+
+      - name: Encode synthetic test frames
+        if: steps.frames.outputs.cache-hit != 'true'
+        run: npm run test-master
+
+      - name: Build site
+        run: scripts/build-site.sh
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

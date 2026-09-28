@@ -17,6 +17,9 @@ scripts/encode-frames.sh   master → AVIF + WebP sets, hold stills, posters, ma
 scripts/qa-frame.sh        encoded frame vs master at 100% + SSIM/PSNR
 scripts/check-launch.sh    fails while placeholders, test frames or assets remain
 scripts/make-test-master.sh  synthetic 779-frame 4K master for testing the rig
+scripts/build-site.sh      builds _site/ for Netlify / GitHub Pages (preview frames until real ones exist)
+netlify.toml               Netlify build settings and headers
+.github/workflows/pages.yml  GitHub Pages deploy
 tests/                     local server + headless-Chromium tests
 ```
 
@@ -29,7 +32,17 @@ npm run serve               # http://localhost:8080/?frames=build/test-frames/&d
 npm test
 ```
 
-The test frames show their own source frame number, plus `HOLD` and `CUT` markers. That makes the frame mapping checkable by eye. The page shows a "Test frames" badge whenever the manifest is synthetic. `build/` is git-ignored: never commit or deploy these frames.
+The test frames show their own source frame number, plus `HOLD` and `CUT` markers. That makes the frame mapping checkable by eye. The page shows a "Test frames" badge whenever the manifest is synthetic. `build/` is git-ignored: never commit these frames.
+
+## Live preview (Netlify or GitHub Pages)
+
+Both hosts run `scripts/build-site.sh`, which publishes `_site/`:
+- **No real frames committed** (the case today): it deploys a **preview**. Synthetic test frames are generated during the build and placed where the real ones will go, with the "Test frames" badge.
+- **Real frames committed** to `assets/frames/`: it publishes them as they are. No configuration change is needed.
+
+**Netlify.** Choose *Add new site → Import an existing project*, pick this repo and deploy. `netlify.toml` supplies the build command, publish directory and headers, so leave the form as it is. Netlify's build image has no ffmpeg, so the build downloads a static one (~150 MB). Each deploy takes about 5–10 minutes; most of that is encoding.
+
+**GitHub Pages.** Go to *Settings → Pages → Source* and choose **GitHub Actions**. `.github/workflows/pages.yml` deploys on every push to `main`. It caches the test frames, so only the first run is slow.
 
 QA switches: `?debug` shows an overlay with set, px, source frame, index, loaded count and fps. `?format=webp|avif` and `?set=desktop|mobile` force a variant. `?frames=<relative path>` swaps the frame source. It accepts same-origin paths only.
 
